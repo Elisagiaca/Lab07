@@ -5,7 +5,8 @@ public class TestModel {
 	public static void main(String[] args) {
 		
 		Model model = new Model();
-		System.out.println(model.getNercList());
+		Nerc n = new Nerc(3,"MAAC");
+			
 
 	}
 

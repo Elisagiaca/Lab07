@@ -5,9 +5,11 @@
 package it.polito.tdp.poweroutages;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import it.polito.tdp.poweroutages.model.Model;
 import it.polito.tdp.poweroutages.model.Nerc;
+import it.polito.tdp.poweroutages.model.PowerOutages;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -16,6 +18,8 @@ import javafx.scene.control.TextField;
 
 public class FXMLController {
 
+	private Model model;
+	 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
 
@@ -33,12 +37,37 @@ public class FXMLController {
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
-
-    private Model model;
+   
     
     @FXML
     void doRun(ActionEvent event) {
     	txtResult.clear();
+    	    	
+		Nerc n = cmbNerc.getValue();
+		int anni = Integer.parseInt(txtYears.getText());
+		int ore = Integer.parseInt(txtHours.getText());
+		
+		if (n == null) {
+			txtResult.setText("Seleziona un NERC.");
+			return;
+		}
+		
+		if (anni<=0) {
+			txtResult.setText("Inserisci un numero di anni maggiore di zero.");
+			return;
+		}
+		
+    	if(ore <= 0) {
+    		txtResult.setText("Inserisci un numero di ore maggiore di zero.");
+    		return;
+    	}
+    	
+    	List<PowerOutages> listaRisultante = (model).trovaSequenza(anni, ore, n);
+    	txtResult.appendText("Totale persone: " + model.sommaPersone(listaRisultante) + "\n");
+    	txtResult.appendText("Totale ore di blackout: " + model.calcolaOre(listaRisultante) + "\n");
+    	for(PowerOutages p : listaRisultante) {
+    		txtResult.appendText(p.toString()+"\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -54,5 +83,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+	    	cmbNerc.getItems().clear();
+	    	for(Nerc n : model.getNercList()) {
+	    		cmbNerc.getItems().add(n);
+	    	}
+    	
     }
 }
